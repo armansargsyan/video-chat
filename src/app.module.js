@@ -19,7 +19,7 @@ AppModule = __decorate([
     common_1.Module({
         imports: [
             serve_static_1.ServeStaticModule.forRoot({
-                rootPath: '../public',
+                rootPath: './public',
             }),
         ],
         controllers: [app_controller_1.AppController],
