@@ -20,6 +20,7 @@ let WsRoomsGateway = class WsRoomsGateway {
     }
     async handleCreateNewRoom(client, req) {
         if (!this.server.adapter.rooms.has(req.id) && client.rooms.size < 2) {
+            console.log('Room Id from test: ', req.id);
             client.join(req.id);
             client.emit('newRoom', { roomId: req.id });
         }
