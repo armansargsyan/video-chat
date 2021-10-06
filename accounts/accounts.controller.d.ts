@@ -9,4 +9,6 @@ export declare class AccountsController {
     validToken(access_token: string): Promise<boolean>;
     signUp(userDto: UserDto): Promise<AccessTokenDto>;
     verification(verificationDto: VerificationDto, accessToken: any): Promise<AccessTokenDto>;
+    clearA(): Promise<string>;
+    clearU(): Promise<string>;
 }

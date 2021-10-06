@@ -74,6 +74,18 @@ let TodoService = class TodoService {
             }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
+    async clearToDos() {
+        try {
+            await this.manager.clear(todo_entity_1.ToDo);
+            return 'ToDos cleared';
+        }
+        catch (e) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                message: 'Something went wrong',
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
 };
 TodoService = __decorate([
     common_1.Injectable(),

@@ -33,6 +33,9 @@ let TodoController = class TodoController {
     async remove(id) {
         return await this.todoService.delete(+id);
     }
+    async clearToDos() {
+        return await this.todoService.clearToDos();
+    }
 };
 __decorate([
     common_1.UseGuards(jwt_auth_guard_1.JwtAuthGuard),
@@ -67,6 +70,12 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], TodoController.prototype, "remove", null);
+__decorate([
+    common_1.Get('clear'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TodoController.prototype, "clearToDos", null);
 TodoController = __decorate([
     common_1.Controller('todo'),
     __metadata("design:paramtypes", [todo_service_1.TodoService])

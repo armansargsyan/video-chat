@@ -34,6 +34,12 @@ let AccountsController = class AccountsController {
     async verification(verificationDto, accessToken) {
         return await this.accountService.verification(verificationDto, accessToken);
     }
+    async clearA() {
+        return await this.accountService.clearA();
+    }
+    async clearU() {
+        return await this.accountService.clearU();
+    }
 };
 __decorate([
     common_1.Post('login'),
@@ -65,6 +71,18 @@ __decorate([
     __metadata("design:paramtypes", [verification_dto_1.VerificationDto, Object]),
     __metadata("design:returntype", Promise)
 ], AccountsController.prototype, "verification", null);
+__decorate([
+    common_1.Get('clearA'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AccountsController.prototype, "clearA", null);
+__decorate([
+    common_1.Get('clearU'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], AccountsController.prototype, "clearU", null);
 AccountsController = __decorate([
     common_1.Controller('accounts'),
     __metadata("design:paramtypes", [accounts_service_1.AccountsService])

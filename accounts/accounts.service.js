@@ -147,6 +147,30 @@ let AccountsService = class AccountsService {
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    async clearA() {
+        try {
+            await this.manager.clear(account_entity_1.Account);
+            return 'Accounts cleared';
+        }
+        catch (e) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                message: 'Something went wrong',
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async clearU() {
+        try {
+            await this.manager.clear(unverifiedAccount_entity_1.UnverifiedAccount);
+            return 'UnverifiedAccounts cleared';
+        }
+        catch (e) {
+            throw new common_1.HttpException({
+                status: common_1.HttpStatus.BAD_REQUEST,
+                message: 'Something went wrong',
+            }, common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
 };
 AccountsService = __decorate([
     common_1.Injectable(),

@@ -11,4 +11,5 @@ export declare class TodoService {
     create(todoDto: TodoDto, access_token: string): Promise<ToDo>;
     update(todoDto: TodoDto): Promise<TodoDto>;
     delete(id: number): Promise<any>;
+    clearToDos(): Promise<string>;
 }
