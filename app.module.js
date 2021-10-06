@@ -39,7 +39,7 @@ AppModule = __decorate([
             }),
             nestjs_twilio_1.TwilioModule.forRoot({
                 accountSid: 'ACe0f0688c733e77fca00c6afb99ac724e',
-                authToken: '9c177290d0b5e8372a6f15c766cf23ec',
+                authToken: '34b7fc6b694fc765a2edecd39951568d',
             }),
             todo_module_1.TodoModule,
             binance_module_1.BinanceModule,
