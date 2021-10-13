@@ -22,8 +22,7 @@ const serve_static_1 = require("@nestjs/serve-static");
 const ws_assets_gateway_1 = require("./ws-assets.gateway");
 const ws_rooms_gateway_1 = require("./ws-rooms.gateway");
 let AppModule = class AppModule {
-    configure(consumer) {
-    }
+    configure(consumer) { }
 };
 AppModule = __decorate([
     common_1.Global(),

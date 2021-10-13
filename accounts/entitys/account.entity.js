@@ -37,6 +37,14 @@ __decorate([
     typeorm_1.Column(),
     __metadata("design:type", String)
 ], Account.prototype, "phoneNumber", void 0);
+__decorate([
+    typeorm_1.Column({ default: false }),
+    __metadata("design:type", Boolean)
+], Account.prototype, "verified", void 0);
+__decorate([
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], Account.prototype, "verificationCode", void 0);
 Account = __decorate([
     typeorm_1.Entity()
 ], Account);

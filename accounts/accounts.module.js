@@ -12,16 +12,12 @@ const typeorm_1 = require("@nestjs/typeorm");
 const account_entity_1 = require("./entitys/account.entity");
 const accounts_service_1 = require("./accounts.service");
 const accounts_controller_1 = require("./accounts.controller");
-const unverifiedAccount_entity_1 = require("./entitys/unverifiedAccount.entity");
 const passport_1 = require("@nestjs/passport");
 let AccountsModule = class AccountsModule {
 };
 AccountsModule = __decorate([
     common_1.Module({
-        imports: [
-            typeorm_1.TypeOrmModule.forFeature([account_entity_1.Account, unverifiedAccount_entity_1.UnverifiedAccount]),
-            passport_1.PassportModule,
-        ],
+        imports: [typeorm_1.TypeOrmModule.forFeature([account_entity_1.Account]), passport_1.PassportModule],
         providers: [accounts_service_1.AccountsService],
         controllers: [accounts_controller_1.AccountsController],
         exports: [accounts_service_1.AccountsService],

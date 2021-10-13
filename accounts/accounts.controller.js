@@ -32,13 +32,11 @@ let AccountsController = class AccountsController {
         return await this.accountService.create(userDto);
     }
     async verification(verificationDto, accessToken) {
+        console.log(accessToken);
         return await this.accountService.verification(verificationDto, accessToken);
     }
-    async clearA() {
-        return await this.accountService.clearA();
-    }
-    async clearU() {
-        return await this.accountService.clearU();
+    async clear() {
+        return await this.accountService.clear();
     }
 };
 __decorate([
@@ -72,17 +70,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AccountsController.prototype, "verification", null);
 __decorate([
-    common_1.Get('clearA'),
+    common_1.Get('clear'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], AccountsController.prototype, "clearA", null);
-__decorate([
-    common_1.Get('clearU'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], AccountsController.prototype, "clearU", null);
+], AccountsController.prototype, "clear", null);
 AccountsController = __decorate([
     common_1.Controller('accounts'),
     __metadata("design:paramtypes", [accounts_service_1.AccountsService])

@@ -6,4 +6,6 @@ export declare class Account extends BaseEntity {
     email: string;
     passwordHash: string;
     phoneNumber: string;
+    verified: boolean;
+    verificationCode: string;
 }

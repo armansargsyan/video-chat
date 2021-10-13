@@ -19,13 +19,11 @@ const bcrypt = require("bcrypt");
 const account_entity_1 = require("./entitys/account.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
-const unverifiedAccount_entity_1 = require("./entitys/unverifiedAccount.entity");
 const nestjs_twilio_1 = require("nestjs-twilio");
 const jwt_auth_service_1 = require("../jwt-auth/jwt-auth.service");
 let AccountsService = class AccountsService {
-    constructor(accountRepository, unverifiedAccountRepository, client, jwtAuthService) {
+    constructor(accountRepository, client, jwtAuthService) {
         this.accountRepository = accountRepository;
-        this.unverifiedAccountRepository = unverifiedAccountRepository;
         this.client = client;
         this.jwtAuthService = jwtAuthService;
         this.manager = typeorm_2.getManager();
@@ -34,13 +32,19 @@ let AccountsService = class AccountsService {
         return Math.floor(Math.random() * 900000 + 100000);
     }
     async create(userDto) {
-        const salt = await bcrypt.genSalt();
-        const code = this.verificationCodeGenerator();
-        userDto.passwordHash = await bcrypt.hash(userDto.password, salt);
-        userDto.verificationCode = `${code}`;
-        delete userDto.password;
-        const account = this.manager.create(unverifiedAccount_entity_1.UnverifiedAccount, userDto);
         try {
+            const findUser = await this.manager.findOne(account_entity_1.Account, {
+                email: userDto.email,
+            });
+            if (findUser) {
+                throw 'busyEmail';
+            }
+            const salt = await bcrypt.genSalt();
+            const code = this.verificationCodeGenerator();
+            userDto.passwordHash = await bcrypt.hash(userDto.password, salt);
+            userDto.verificationCode = `${code}`;
+            delete userDto.password;
+            const account = this.manager.create(account_entity_1.Account, userDto);
             await account.save();
             await this.sendSMS(userDto.phoneNumber, code);
             return this.jwtAuthService.sign({
@@ -49,12 +53,13 @@ let AccountsService = class AccountsService {
             });
         }
         catch (e) {
-            if (e.code === 'ER_DUP_ENTRY') {
+            if (e === 'busyEmail') {
                 throw new common_1.HttpException({
                     status: common_1.HttpStatus.CONFLICT,
-                    message: e.message,
+                    message: 'Email is already in use',
                 }, common_1.HttpStatus.CONFLICT);
             }
+            console.log('Error Create: ', e);
             throw new common_1.HttpException({
                 status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
                 message: e.message,
@@ -63,7 +68,9 @@ let AccountsService = class AccountsService {
     }
     async logIn(userDto) {
         try {
-            const foundUser = await account_entity_1.Account.findOne({ email: userDto.email });
+            const foundUser = await this.manager.findOne(account_entity_1.Account, {
+                email: userDto.email,
+            });
             if (!foundUser) {
                 throw common_1.HttpStatus.BAD_REQUEST;
             }
@@ -72,10 +79,13 @@ let AccountsService = class AccountsService {
                 throw common_1.HttpStatus.BAD_REQUEST;
             }
             else {
-                return this.jwtAuthService.sign({
-                    email: foundUser.email,
-                    id: foundUser.id,
-                });
+                return {
+                    verified: foundUser.verified,
+                    access_token: this.jwtAuthService.sign({
+                        email: foundUser.email,
+                        id: foundUser.id,
+                    }).access_token,
+                };
             }
         }
         catch (e) {
@@ -95,7 +105,7 @@ let AccountsService = class AccountsService {
         try {
             const body = this.jwtAuthService.validate(access_token);
             const foundUser = await account_entity_1.Account.findOne(body.id);
-            return !(!foundUser || !body);
+            return !(!foundUser || !body || !foundUser.verified);
         }
         catch (e) {
             throw new common_1.HttpException({
@@ -107,17 +117,19 @@ let AccountsService = class AccountsService {
     async verification(verificationDto, access_token) {
         try {
             const body = this.jwtAuthService.validate(access_token);
-            const foundUser = await unverifiedAccount_entity_1.UnverifiedAccount.findOne({
+            const foundUser = await this.manager.findOne(account_entity_1.Account, {
                 email: body.email,
                 verificationCode: verificationDto.code,
             });
             if (!foundUser) {
                 throw common_1.HttpStatus.BAD_REQUEST;
             }
-            const account = this.manager.create(account_entity_1.Account, foundUser);
-            await account.save();
-            await this.manager.delete(unverifiedAccount_entity_1.UnverifiedAccount, foundUser.id);
-            return this.jwtAuthService.sign({ email: account.email, id: account.id });
+            foundUser.verified = true;
+            await foundUser.save();
+            return this.jwtAuthService.sign({
+                email: foundUser.email,
+                id: foundUser.id,
+            });
         }
         catch (e) {
             if (e === common_1.HttpStatus.BAD_REQUEST) {
@@ -147,7 +159,7 @@ let AccountsService = class AccountsService {
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    async clearA() {
+    async clear() {
         try {
             await this.manager.clear(account_entity_1.Account);
             return 'Accounts cleared';
@@ -159,26 +171,12 @@ let AccountsService = class AccountsService {
             }, common_1.HttpStatus.BAD_REQUEST);
         }
     }
-    async clearU() {
-        try {
-            await this.manager.clear(unverifiedAccount_entity_1.UnverifiedAccount);
-            return 'UnverifiedAccounts cleared';
-        }
-        catch (e) {
-            throw new common_1.HttpException({
-                status: common_1.HttpStatus.BAD_REQUEST,
-                message: 'Something went wrong',
-            }, common_1.HttpStatus.BAD_REQUEST);
-        }
-    }
 };
 AccountsService = __decorate([
     common_1.Injectable(),
-    __param(0, typeorm_1.InjectRepository(unverifiedAccount_entity_1.UnverifiedAccount)),
-    __param(1, typeorm_1.InjectRepository(unverifiedAccount_entity_1.UnverifiedAccount)),
-    __param(2, nestjs_twilio_1.InjectTwilio()),
-    __metadata("design:paramtypes", [typeorm_2.Repository,
-        typeorm_2.Repository, Object, jwt_auth_service_1.JwtAuthService])
+    __param(0, typeorm_1.InjectRepository(account_entity_1.Account)),
+    __param(1, nestjs_twilio_1.InjectTwilio()),
+    __metadata("design:paramtypes", [typeorm_2.Repository, Object, jwt_auth_service_1.JwtAuthService])
 ], AccountsService);
 exports.AccountsService = AccountsService;
 //# sourceMappingURL=accounts.service.js.map
